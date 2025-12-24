@@ -1,19 +1,23 @@
 return {
-	"nvim-treesitter/nvim-treesitter",
-	dependencies = {
-		"nvim-treesitter/nvim-treesitter-textobjects"
-	},
-	build = ":TSUpdate",
-	event = { "BufReadPost", "BufNewFile" },
-	config = function()
-		require("nvim-treesitter.configs").setup({
-			ensure_installed = { "lua", "c", "cpp", "rust", "java", "javascript" },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		lazy = false,
+		build = ":TSUpdate",
+		event = { "BufReadPost", "BufNewFile" },
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter-textobjects",
+		},
+		opts = {
+			ensure_installed = { "lua", "c", "cpp", "rust", "java", "javascript", "gdscript", "gdshader", "godot_resource", "c_sharp" },
 
 			sync_install = false,
 			auto_install = true,
 
-			highlight = { enable = true },
-			indent = { enable = true },
+			highlight = {
+				enable = true,
+				disable = { "c", "cpp" }
+			},
+			indent = { enable = false },
 			textobjects = {
 				select = {
 					enable = true,
@@ -23,10 +27,9 @@ return {
 						["aa"] = "@parameter.outer",
 						["af"] = "@function.outer",
 						["if"] = "@function.inner",
-					},
-				},
-			},
-		})
-	end
+					}
+				}
+			}
+		}
+	},
 }
-

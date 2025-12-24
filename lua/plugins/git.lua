@@ -6,6 +6,7 @@ return {
 		end,
 	},
 	{
-		"tpope/vim-fugitive"
+		"tpope/vim-fugitive",
 	}
 }
+

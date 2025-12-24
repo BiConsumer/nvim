@@ -61,8 +61,12 @@ return {
 		vim.keymap.set("n", "<Tab>", ":bnext<CR>")
 		vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>")
 		vim.keymap.set("n", "<leader>bd", function()
-			vim.cmd("bnext")
-			vim.cmd("bd#")
+			local current = vim.api.nvim_get_current_buf()
+			if #vim.fn.getbufinfo({ buflisted = 1 }) > 1 then
+				vim.cmd("bnext")
+			end
+
+			vim.cmd("bdelete " .. current)
 		end)
 
 		require("tabby").setup({

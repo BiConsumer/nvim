@@ -1,21 +1,13 @@
-#include <iostream>
-struct deez {
-	int balls{0};
-};
+// Begin the muscle::rendering::d3d12 namespace
+#define MUSCLE_D3D12_NAMESPACE_BEGIN \
+	namespace muscle::rendering::d3d12 {
 
-void fun() {
-	
-}
+// End the muscle::rendering::d3d12 namespace
+#define MUSCLE_D3D12_NAMESPACE_END \
+	} // namespace muscle::rendering::d3d12
 
-int main() {
-	deez deez{};
-	deez.balls = 10;
+MUSCLE_D3D12_NAMESPACE_BEGIN
 
-	char a[10];
-	a[10] = 0;
+class test {};
 
-	std::cout << "deez";
-
-	return 0;
-}
-
+MUSCLE_D3D12_NAMESPACE_END
