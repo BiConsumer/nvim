@@ -102,10 +102,10 @@ return {
 		})
 
 		vim.lsp.config("rust_analyzer", {})
-		vim.lsp.config("tsserver", {})
+		vim.lsp.config("ts_ls", {})
 		vim.lsp.config("gdscript", {})
 		vim.lsp.config("roslyn_ls", {})
-		vim.lsp.enable({ "lua_ls", "jdtls", "jsonls", "neocmake", "clangd", "glsl_analyzer", "rust_analyzer", "tsserver",
+		vim.lsp.enable({ "lua_ls", "jdtls", "jsonls", "neocmake", "clangd", "glsl_analyzer", "rust_analyzer", "ts_ls",
 			"gdscript", "roslyn_ls" })
 
 		-- lsp cpp highlight groups
