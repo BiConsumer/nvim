@@ -16,6 +16,7 @@ return {
 			enable = true,
 			disable = { "c", "cpp" }
 		},
+
 		indent = { enable = false },
 		textobjects = {
 			select = {

@@ -8,6 +8,10 @@
 
 MUSCLE_D3D12_NAMESPACE_BEGIN
 
-class test {};
+class test {
+public:
+	test() {}
+	~test() {}
+};
 
 MUSCLE_D3D12_NAMESPACE_END
