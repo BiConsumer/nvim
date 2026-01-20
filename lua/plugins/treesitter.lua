@@ -33,5 +33,23 @@ return {
 	},
 	config = function(_, opts)
 		require("nvim-treesitter").setup(opts)
+
+		vim.api.nvim_create_autocmd("FileType", {
+			group = vim.api.nvim_create_augroup("flex_treesitter", { clear = true }),
+			callback = function(ev)
+				local lang = vim.treesitter.language.get_lang(ev.match)
+
+				local function enabled(feat)
+					local f = opts[feat] or {}
+					return f.enable ~= false
+						and not (type(f.disable) == "table" and vim.tbl_contains(f.disable, lang))
+				end
+
+				-- highlighting
+				if enabled("highlight") then
+					pcall(vim.treesitter.start, ev.buf)
+				end
+			end,
+		})
 	end,
 }
