@@ -16,6 +16,15 @@ vim.opt.fillchars = {
 	foldsep = "│",
 	foldclose = "▸",
 }
+vim.opt.sessionoptions = {
+	"buffers",
+	"curdir",
+	"folds",
+	"help",
+	"tabpages",
+	"winsize",
+	"globals",
+}
 
 require("config.lazy")
 require("config.keymaps")

@@ -56,7 +56,6 @@ return {
     "nanozuki/tabby.nvim",
     config = function()
 		vim.o.showtabline = 2
-		vim.opt.sessionoptions = "curdir,folds,globals,help,tabpages,terminal,winsize"
 
 		vim.keymap.set("n", "<Tab>", ":bnext<CR>")
 		vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>")

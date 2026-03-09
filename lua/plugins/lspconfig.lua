@@ -13,7 +13,8 @@ return {
 			end
 		},
 		"hrsh7th/nvim-cmp",
-		"nvim-java/nvim-java"
+		"nvim-java/nvim-java",
+		"lopi-py/luau-lsp.nvim"
 	},
 	config = function()
 		vim.api.nvim_create_autocmd("LspAttach", {
@@ -105,8 +106,65 @@ return {
 		vim.lsp.config("ts_ls", {})
 		vim.lsp.config("gdscript", {})
 		vim.lsp.config("roslyn_ls", {})
+		vim.lsp.config("slangd", {})
+		vim.filetype.add({
+			extension = {
+				hlsl = "hlsl",
+				hlsli = "hlsl",
+			},
+		})
+
+		require("luau-lsp").setup {
+			platform = {
+				type = "roblox",
+			},
+			types = {
+				roblox_security_level = "PluginSecurity",
+			},
+			sourcemap = {
+				enabled = true,
+				autogenerate = true, -- automatic generation when the server is initialized
+				rojo_project_file = "default.project.json",
+				sourcemap_file = "sourcemap.json",
+			},
+			fflags = {
+				enable_new_solver = true, -- enables the fflags required for luau's new type solver
+				sync = true
+			},
+			plugin = {
+				enabled = true,
+				port = 3667,
+			},
+		}
+
+		vim.filetype.add({
+			extension = {
+				luau = "luau"
+			},
+		})
+
+		vim.lsp.config("*", {
+			capabilities = {
+				workspace = {
+					didChangeWatchedFiles = {
+						dynamicRegistration = true,
+					},
+				},
+			},
+		})
+
+		-- vim.lsp.config("*", {
+		-- 	capabilities = {
+		-- 		workspace = {
+		-- 			didChangeWatchedFiles = {
+		-- 				dynamicRegistration = true,
+		-- 			},
+		-- 		},
+		-- 	},
+		-- })
+
 		vim.lsp.enable({ "lua_ls", "jdtls", "jsonls", "neocmake", "clangd", "glsl_analyzer", "rust_analyzer", "ts_ls",
-			"gdscript", "roslyn_ls" })
+			"gdscript", "roslyn_ls", "slangd" })
 
 		-- lsp cpp highlight groups
 		vim.api.nvim_set_hl(0, "cStructure", { link = "Keyword" })
