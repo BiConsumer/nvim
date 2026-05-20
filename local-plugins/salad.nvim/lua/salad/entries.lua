@@ -35,31 +35,31 @@ local trash = {}
 local next_id = 1
 
 function M.clear()
-	if not vim.tbl_isempty(trash) then
-		return
-	end
+    if not vim.tbl_isempty(trash) then
+        return
+    end
 
-	next_id = 1
-	entries_by_path = {}
-	entries_by_id = {}
-	trash = {}
+    next_id = 1
+    entries_by_path = {}
+    entries_by_id = {}
+    trash = {}
 end
 
 ---@param id integer
 ---@return string
 function M.format_id(id)
-	return "/" .. id
+    return "/" .. id
 end
 
 ---@param 	line string
 ---@return number|nil id
 function M.parse_line(line)
-	local value = line:match("^/(%d+) (.+)$")
-	if not value then
-		return nil
-	end
+    local value = line:match("^/(%d+) (.+)$")
+    if not value then
+        return nil
+    end
 
-	return tonumber(value)
+    return tonumber(value)
 end
 
 ---@param scheme string
@@ -67,28 +67,28 @@ end
 ---@param type salad.EntryType
 ---@return salad.Entry
 function M.create_entry(scheme, path, type)
-	local entry = entries_by_path[scheme] and entries_by_path[scheme][path] or nil
-	if entry then
-		return entry
-	end
+    local entry = entries_by_path[scheme] and entries_by_path[scheme][path] or nil
+    if entry then
+        return entry
+    end
 
-	return { nil, path, type, {}, nil }
+    return { nil, path, type, {}, nil }
 end
 
 ---@param scheme string
 ---@param entry salad.Entry
 function M.store_entry(scheme, entry)
-	local id = entry[FIELD_ID]
-	if id == nil then
-		id = next_id
-		next_id = next_id + 1
-		entry[FIELD_ID] = id
-	end
+    local id = entry[FIELD_ID]
+    if id == nil then
+        id = next_id
+        next_id = next_id + 1
+        entry[FIELD_ID] = id
+    end
 
-	local path = entry[FIELD_PATH]
-	entries_by_path[scheme] = entries_by_path[scheme] or {}
-	entries_by_path[scheme][path] = entry
-	entries_by_id[id] = entry
+    local path = entry[FIELD_PATH]
+    entries_by_path[scheme] = entries_by_path[scheme] or {}
+    entries_by_path[scheme][path] = entry
+    entries_by_id[id] = entry
 end
 
 ---@param scheme string
@@ -96,23 +96,22 @@ end
 ---@param type salad.EntryType
 ---@return salad.Entry
 function M.create_and_store_entry(scheme, path, type)
-	local entry = M.create_entry(scheme, path, type)
-	M.store_entry(scheme, entry)
-	return entry
+    local entry = M.create_entry(scheme, path, type)
+    M.store_entry(scheme, entry)
+    return entry
 end
 
 ---@param id integer
 ---@return salad.Entry|nil
 function M.get_entry_by_id(id)
-	return entries_by_id[id]
+    return entries_by_id[id]
 end
 
 ---@param scheme string
----@param path string 
+---@param path string
 ---@return salad.Entry|nil
 function M.get_entry_by_path(scheme, path)
-	return entries_by_path[scheme] and entries_by_path[scheme][path] or nil
+    return entries_by_path[scheme] and entries_by_path[scheme][path] or nil
 end
 
 return M
-

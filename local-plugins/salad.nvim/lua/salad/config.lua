@@ -1,73 +1,73 @@
 local DEFAULT_CONFIG = {
-	lsp_file_methods = {
-		enabled = true,
-		timeout_ms = 1000
-	},
-	watch_changes = true,
-	read_batch_size = 1024,
-	keymaps = {
-		select = {
-			{ "n", "<CR>" }
-		},
-		close = {
-			{ "n", "q" },
-			{ "n", "<ESC>" }
-		},
-		focus = {
-			{ "n", "<leader>f" }
-		},
-		show_parent = {
-			{ "n", "<leader>sp" }
-		},
-		go_cwd = {
-			{ "n", "<leader>gc" }
-		}
-	},
-	drivers = {
-		files = "salad://",
-		ssh = "salad-ssh://"
-	},
-	view_options = {
-		show_hidden = true,
-		show_diagnostics = true,
-		indent = 2,
-		glyphs = {
-			arrow_closed = "",
-			arrow_open = ""
-		},
-		win_options = {
-			wrap = false,
-			signcolumn = "no",
-			foldcolumn = "0",
-			spell = false,
-			list = false,
-			conceallevel = 3,
-			concealcursor = "nvic"
-		},
-		should_expand = function(depth)
-			return depth == 0
-		end,
-		is_always_hidden = function(_)
-			return false
-		end,
-		is_hidden_file = function(path)
-			local match = path:match("(^%.)") or path:match("(/%.)")
-			return match ~= nil
-		end,
-		highlight_filename = function()
+    lsp_file_methods = {
+        enabled = true,
+        timeout_ms = 1000
+    },
+    watch_changes = true,
+    read_batch_size = 1024,
+    keymaps = {
+        select = {
+            { "n", "<CR>" }
+        },
+        close = {
+            { "n", "q" },
+            { "n", "<ESC>" }
+        },
+        focus = {
+            { "n", "<leader>f" }
+        },
+        show_parent = {
+            { "n", "<leader>sp" }
+        },
+        go_cwd = {
+            { "n", "<leader>gc" }
+        }
+    },
+    drivers = {
+        files = "salad://",
+        ssh = "salad-ssh://"
+    },
+    view_options = {
+        show_hidden = true,
+        show_diagnostics = true,
+        indent = 2,
+        glyphs = {
+            arrow_closed = "",
+            arrow_open = ""
+        },
+        win_options = {
+            wrap = false,
+            signcolumn = "no",
+            foldcolumn = "0",
+            spell = false,
+            list = false,
+            conceallevel = 3,
+            concealcursor = "nvic"
+        },
+        should_expand = function(depth)
+            return depth == 0
+        end,
+        is_always_hidden = function(_)
+            return false
+        end,
+        is_hidden_file = function(path)
+            local match = path:match("(^%.)") or path:match("(/%.)")
+            return match ~= nil
+        end,
+        highlight_filename = function()
 
-		end,
-		icon_for_file = function(path, type)
-			local has_devicons, devicons = pcall(require, "mini.icons")
-			if not has_devicons then
-				return
-			end
+        end,
+        icon_for_file = function(path, type)
+            local has_devicons, devicons = pcall(require, "mini.icons")
+            if not has_devicons then
+                return
+            end
 
-			local icon, hl = devicons.get(type, path)
-			icon = icon or ""
-			return icon, hl
-		end
-	}
+            local icon, hl = devicons.get(type, path)
+            icon = icon or ""
+            return icon, hl
+        end
+    }
 }
 
 ---@class salad.Config
@@ -121,56 +121,55 @@ local M = {}
 
 ---@param setup_options? salad.SetupOptions
 function M.setup(setup_options)
-	setup_options = setup_options or {}
-	local new_conf = vim.tbl_extend("keep", setup_options, DEFAULT_CONFIG)
-	for k, v in pairs(new_conf) do
-		M[k] = v
-	end
+    setup_options = setup_options or {}
+    local new_conf = vim.tbl_extend("keep", setup_options, DEFAULT_CONFIG)
+    for k, v in pairs(new_conf) do
+        M[k] = v
+    end
 
-	M._drivers_by_scheme = {}
-	M._drivers_cache = {}
-	for driver, scheme in pairs(M.drivers) do
-		M._drivers_by_scheme[scheme] = driver
-	end
+    M._drivers_by_scheme = {}
+    M._drivers_cache = {}
+    for driver, scheme in pairs(M.drivers) do
+        M._drivers_by_scheme[scheme] = driver
+    end
 end
 
 ---@param scheme? string
 ---@return salad.Driver|nil
 function M.get_driver_by_scheme(scheme)
-	if not scheme then
-		return nil
-	end
+    if not scheme then
+        return nil
+    end
 
-	if not vim.endswith(scheme, "://") then
-		local pieces = vim.split(scheme, "://", { plain = true })
-		if #pieces <= 2 then
-			scheme = pieces[1] .. "://"
-		else
-			error(string.format("Malformed url: '%s'", scheme))
-			return nil
-		end
-	end
+    if not vim.endswith(scheme, "://") then
+        local pieces = vim.split(scheme, "://", { plain = true })
+        if #pieces <= 2 then
+            scheme = pieces[1] .. "://"
+        else
+            error(string.format("Malformed url: '%s'", scheme))
+            return nil
+        end
+    end
 
-	local name = M._drivers_by_scheme[scheme]
-	if not name then
-		return nil
-	end
+    local name = M._drivers_by_scheme[scheme]
+    if not name then
+        return nil
+    end
 
-	local driver = M._drivers_cache[name]
-	if driver == nil then
-		local ok
-		ok, driver = pcall(require, string.format("salad.drivers.%s", name))
+    local driver = M._drivers_cache[name]
+    if driver == nil then
+        local ok
+        ok, driver = pcall(require, string.format("salad.drivers.%s", name))
 
-		if ok then
-			M._drivers_cache[name] = driver
-		else
-			M._drivers_cache[name] = false
-			driver = false
-		end
-	end
+        if ok then
+            M._drivers_cache[name] = driver
+        else
+            M._drivers_cache[name] = false
+            driver = false
+        end
+    end
 
-	return driver and driver or nil
+    return driver and driver or nil
 end
 
 return M
-

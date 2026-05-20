@@ -10,6 +10,5 @@ local function open_rename_menu(items, new_name)
 end
 
 return {
-	open_rename_menu = open_rename_menu
+    open_rename_menu = open_rename_menu
 }
-

@@ -9,29 +9,29 @@ M.is_windows = libuv.os_uname().version:match("Windows")
 ---@param win integer
 ---@param options vim.api.keyset.win_config
 function M.set_win_options(win, options)
-	for k, v in pairs(options) do
-		vim.api.nvim_set_option_value(k, v, { scope = "local", win = win })
-	end
+    for k, v in pairs(options) do
+        vim.api.nvim_set_option_value(k, v, { scope = "local", win = win })
+    end
 end
 
 ---@param path string
 ---@return integer|nil
 function M.find_buffer(path)
-	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-		if vim.api.nvim_buf_get_name(bufnr) == path then
-			return bufnr
-		end
-	end
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_get_name(bufnr) == path then
+            return bufnr
+        end
+    end
 
-	return nil
+    return nil
 end
 
 ---@param root_path string
 ---@param expands table<string, boolean>
 ---@return string
 function M.make_expands_key(root_path, expands)
-	---@param path string
-	---@return boolean
+    ---@param path string
+    ---@return boolean
     local function is_visible(path)
         if path == root_path then
             return true
@@ -49,8 +49,8 @@ function M.make_expands_key(root_path, expands)
 
             local next_parent = vim.fn.fnamemodify(parent, ":h")
             if next_parent == parent then
-				return false
-			end
+                return false
+            end
 
             parent = next_parent
         end
@@ -73,72 +73,72 @@ end
 ---@return string[]
 ---@return salad.Highlights[] highlights
 function M.render_table(lines)
-	local str_lines = {}
-	local highlights = {}
-	for _, cols in ipairs(lines) do
-		local pieces = {}
-		local col = 0
-		for _, chunk in ipairs(cols) do
-			local text, hl
-			if type(chunk) == "string" then
-				text = chunk
-			else
-				text = chunk[1]
-				hl = chunk[2]
-			end
+    local str_lines = {}
+    local highlights = {}
+    for _, cols in ipairs(lines) do
+        local pieces = {}
+        local col = 0
+        for _, chunk in ipairs(cols) do
+            local text, hl
+            if type(chunk) == "string" then
+                text = chunk
+            else
+                text = chunk[1]
+                hl = chunk[2]
+            end
 
-			if text then
-				table.insert(pieces, text)
-				local col_end = col + text:len() + 1
+            if text then
+                table.insert(pieces, text)
+                local col_end = col + text:len() + 1
 
-				if hl then
-					table.insert(highlights, { hl, #str_lines, col, col_end })
-				end
+                if hl then
+                    table.insert(highlights, { hl, #str_lines, col, col_end })
+                end
 
-				col = col_end
-			end
-		end
+                col = col_end
+            end
+        end
 
-		table.insert(str_lines, table.concat(pieces, " "))
-	end
+        table.insert(str_lines, table.concat(pieces, " "))
+    end
 
-	return str_lines, highlights
+    return str_lines, highlights
 end
 
 ---@param bufnr integer
 ---@param actions table
 function M.setup_keymaps(bufnr, actions)
-	for name, keymaps in pairs(config.keymaps) do
-		if actions[name] ~= nil then
-			for _, keymap in ipairs(keymaps) do
-				vim.keymap.set(keymap[1], keymap[2], actions[name], {
-					buffer = bufnr
-				})
-			end
-		else
-			vim.print("no action named " .. name)
-		end
-	end
+    for name, keymaps in pairs(config.keymaps) do
+        if actions[name] ~= nil then
+            for _, keymap in ipairs(keymaps) do
+                vim.keymap.set(keymap[1], keymap[2], actions[name], {
+                    buffer = bufnr
+                })
+            end
+        else
+            vim.print("no action named " .. name)
+        end
+    end
 end
 
 ---@param path string
 ---@return boolean
 function M.is_absolute(path)
-	if M.is_windows then
-		return path:match("^%a:\\")
-	end
+    if M.is_windows then
+        return path:match("^%a:\\")
+    end
 
-	return vim.startswith(path, "/")
+    return vim.startswith(path, "/")
 end
 
 ---@param p string
 ---@return string[]
 function M.split_path(p)
-  local t = {}
-  for comp in string.gmatch(p, "[^/]+") do
-    table.insert(t, comp)
-  end
-  return t
+    local t = {}
+    for comp in string.gmatch(p, "[^/]+") do
+        table.insert(t, comp)
+    end
+    return t
 end
 
 ---@param path string
@@ -175,87 +175,87 @@ end
 ---@param path string
 ---@return string
 function M.os_to_posix_path(path)
-	if M.is_windows then
-		if M.is_absolute(path) then
-			local drive, rem = path:match("^([^:]+):\\(.*)$")
-			return string.format("/%s/%s", drive:upper(), rem:gsub("\\", "/"))
-		end
+    if M.is_windows then
+        if M.is_absolute(path) then
+            local drive, rem = path:match("^([^:]+):\\(.*)$")
+            return string.format("/%s/%s", drive:upper(), rem:gsub("\\", "/"))
+        end
 
-		local new_path = path:gsub("\\", "/")
-		return new_path
-	end
+        local new_path = path:gsub("\\", "/")
+        return new_path
+    end
 
-	return path
+    return path
 end
 
 ---@param path string
 ---@return string
 function M.posix_to_os_path(path)
-	if M.is_windows then
-		if vim.startswith(path, "/") then
-			local drive = path:match("^/(%a+)")
-			if not drive then
-				local value = path:gsub("/", "\\")
-				return value
-			end
+    if M.is_windows then
+        if vim.startswith(path, "/") then
+            local drive = path:match("^/(%a+)")
+            if not drive then
+                local value = path:gsub("/", "\\")
+                return value
+            end
 
-			local rem = path:sub(drive:len() + 2)
-			return string.format("%s:%s", drive, rem:gsub("/", "\\"))
-		end
+            local rem = path:sub(drive:len() + 2)
+            return string.format("%s:%s", drive, rem:gsub("/", "\\"))
+        end
 
-		local new_path = path:gsub("/", "\\")
-		return new_path
-	end
+        local new_path = path:gsub("/", "\\")
+        return new_path
+    end
 
-	return path
+    return path
 end
 
 ---@param path string
 ---@param os_slash? boolean
 ---@return string
 function M.slashed(path, os_slash)
-	local slash = "/"
-	if os_slash and M.is_windows then
-		slash = "\\"
-	end
+    local slash = "/"
+    if os_slash and M.is_windows then
+        slash = "\\"
+    end
 
-	local endslash = path:match(slash .. "$")
-	if not endslash then
-		return path .. slash
-	end
+    local endslash = path:match(slash .. "$")
+    if not endslash then
+        return path .. slash
+    end
 
-	return path
+    return path
 end
 
 ---@param path string
 ---@param parent string
 ---@return boolean
 function M.is_child_of(path, parent)
-	if M.is_windows then
-		path = path:lower()
-		parent = parent:lower()
-	end
+    if M.is_windows then
+        path = path:lower()
+        parent = parent:lower()
+    end
 
-	parent = M.slashed(parent)
-	return path:sub(1, #parent) == parent
+    parent = M.slashed(parent)
+    return path:sub(1, #parent) == parent
 end
 
 ---@param path string
 ---@param relative_to string
 ---@return string
 function M.shorten(path, relative_to)
-	if not M.is_child_of(path, relative_to) then
-		return ""
-	end
+    if not M.is_child_of(path, relative_to) then
+        return ""
+    end
 
-	return path:sub(1, #relative_to)
+    return path:sub(1, #relative_to)
 end
 
 ---@param root_path string
 ---@param path string
 ---@return integer
 function M.get_depth(root_path, path)
-	local rel = path:gsub("^" .. vim.pesc(root_path) .. "/?", "")
+    local rel = path:gsub("^" .. vim.pesc(root_path) .. "/?", "")
     local depth = 0
     if rel ~= path then
         -- count slashes in dirname
@@ -265,55 +265,55 @@ function M.get_depth(root_path, path)
         end
     end
 
-	return depth
+    return depth
 end
 
 ---@param path string
 ---@return string
 function M.get_filename(path)
-	local filename = path:match("([^/]+)$")
-	return filename
+    local filename = path:match("([^/]+)$")
+    return filename
 end
 
 ---@param url string
 ---@return string|nil scheme
 ---@return string|nil path
 function M.parse_url(url)
-	return url:match("^(.*://)(.*)$")
+    return url:match("^(.*://)(.*)$")
 end
 
 ---@param dir? string
 ---@return string
 function M.get_url_for_path(dir)
-	if dir then
-		local scheme = M.parse_url(dir)
-		if scheme then
-			return dir
-		end
+    if dir then
+        local scheme = M.parse_url(dir)
+        if scheme then
+            return dir
+        end
 
-		local abs_path = vim.fn.fnamemodify(dir, ":p")
-		local path = M.os_to_posix_path(abs_path)
-		return config.drivers.files .. path
-	end
+        local abs_path = vim.fn.fnamemodify(dir, ":p")
+        local path = M.os_to_posix_path(abs_path)
+        return config.drivers.files .. path
+    end
 
-	local bufname = vim.api.nvim_buf_get_name(0)
-	local scheme = M.parse_url(bufname)
+    local bufname = vim.api.nvim_buf_get_name(0)
+    local scheme = M.parse_url(bufname)
 
-	if not scheme then
-		local cwd = M.os_to_posix_path(vim.fn.getcwd())
-		local buf_path = M.os_to_posix_path(vim.fn.fnamemodify(bufname, ":p:h"))
-		local parent
+    if not scheme then
+        local cwd = M.os_to_posix_path(vim.fn.getcwd())
+        local buf_path = M.os_to_posix_path(vim.fn.fnamemodify(bufname, ":p:h"))
+        local parent
 
-		if bufname == "" or M.is_child_of(buf_path, cwd) then
-			parent = M.os_to_posix_path(cwd)
-		else
-			parent = M.os_to_posix_path(buf_path)
-		end
+        if bufname == "" or M.is_child_of(buf_path, cwd) then
+            parent = M.os_to_posix_path(cwd)
+        else
+            parent = M.os_to_posix_path(buf_path)
+        end
 
-		return M.slashed(config.drivers.files .. parent)
-	end
+        return M.slashed(config.drivers.files .. parent)
+    end
 
-	return bufname
+    return bufname
 end
 
 return M

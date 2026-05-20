@@ -1,70 +1,111 @@
 return {
-	{
-		"github/copilot.vim"
-	},
-	{
-		"saghen/blink.cmp",
-		version = "^1.8.0",
-		opts = {
-			signature = { enabled = true }
-		}
-	},
-	-- {
-	-- 	"ray-x/lsp_signature.nvim",
-	-- 	event = "InsertEnter",
-	-- 	opts = {
-	-- 		close_timeout = 0,
-	-- 		fix_pos = false,
-	-- 		always_trigger = true
-	-- 	}
-	-- },
-	-- {
-	-- 	"hrsh7th/nvim-cmp",
-	-- 	dependencies = {
-	-- 		"hrsh7th/cmp-nvim-lsp",
-	-- 		"hrsh7th/cmp-buffer",
-	-- 		"hrsh7th/cmp-path",
-	-- 		"L3MON4D3/LuaSnip",
-	-- 		"saadparwaiz1/cmp_luasnip"
-	-- 	},
-	-- 	config = function()
-	-- 		local cmp = require("cmp")
-	-- 		local luasnip = require("luasnip")
-	--
-	-- 		cmp.setup({
-	-- 			mapping = cmp.mapping.preset.insert({
-	-- 				["<C-b>"] = cmp.mapping.scroll_docs(-4),
-	-- 				["<C-f>"] = cmp.mapping.scroll_docs(4),
-	-- 				["<C-Space>"] = cmp.mapping.complete(),
-	-- 				["<C-e>"] = cmp.mapping.abort(),
-	-- 				["<CR>"] = cmp.mapping.confirm({ select = true }),
-	-- 				["<Tab>"] = cmp.mapping(function(fallback)
-	-- 					if cmp.visible() then
-	-- 						cmp.select_next_item()
-	-- 					elseif luasnip.expand_or_jumpable() then
-	-- 						luasnip.expand_or_jump()
-	-- 					else
-	-- 						fallback()
-	-- 					end
-	-- 				end, { "i", "s" }),
-	-- 				["<S-Tab>"] = cmp.mapping(function(fallback)
-	-- 					if cmp.visible() then
-	-- 						cmp.select_prev_item()
-	-- 					elseif luasnip.jumpable(-1) then
-	-- 						luasnip.jump(-1)
-	-- 					else
-	-- 						fallback()
-	-- 					end
-	-- 				end, { "i", "s" })
-	-- 			}),
-	-- 			sources = cmp.config.sources({
-	-- 				{ name = "nvim_lsp" },
-	-- 				{ name = "luasnip" }
-	-- 			}, {
-	-- 				{ name = "buffer" },
-	-- 				{ name = "path" }
-	-- 			})
-	-- 		})
-	-- 	end
-	-- }
+    {
+        "github/copilot.vim"
+    },
+    {
+        "saghen/blink.cmp",
+        version = "^1.8.0",
+        dependencies = {
+            {
+                "L3MON4D3/LuaSnip",
+                version = "v2.*",
+                config = function()
+                    -- local luasnip = require("luasnip")
+                    -- luasnip.add_snippets("cpp", require("snippets.cpp"))
+                end
+            },
+        },
+        ---@module 'blink.cmp'
+        opts = {
+            -- keymap = {
+            -- 	["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+            -- 	["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+            -- 	["<CR>"] = { "select_and_accept", "fallback" },
+            -- 	["<C-e>"] = { "hide", "fallback" },
+            -- },
+
+            appearance = {
+                nerd_font_variant = "mono",
+            },
+            signature = {
+                enabled = true,
+                window = {
+                    show_documentation = false,
+                },
+            },
+            completion = {
+                trigger = {
+                    show_on_insert_on_trigger_character = true,
+                    show_on_accept_on_trigger_character = false,
+                    show_on_blocked_trigger_characters = { "{", "(", "}", ")" },
+                },
+                documentation = {
+                    auto_show = true,
+                    auto_show_delay_ms = 200,
+                },
+                menu = {
+                    auto_show = true,
+                    scrollbar = false,
+                    draw = {
+                        columns = {
+                            { "kind_icon" },
+                            { "label",             "label_description", gap = 1 },
+                            { "kind",              gap = 1 },
+                            { "label_description", gap = 1 },
+                            { "source_name",       gap = 1 },
+                        },
+                        components = {
+                            kind_icon = {
+                                ellipsis = false,
+                                width = { fill = true },
+                                text = function(ctx)
+                                    local kind_icons = {
+                                        Function = "λ", -- Lambda symbol for functions
+                                        Method = "∂", -- Lambda symbol for methods
+                                        Field = "󰀫", -- Lambda symbol for methods
+                                        Variable = "󰀫", -- Lambda symbol for methods
+                                        Property = "󰀫", -- Lambda symbol for methods
+                                        Keyword = "k", -- Lambda symbol for methods
+                                        Struct = "Π", -- Lambda symbol for methods
+                                        Enum = "τ", -- Lambda symbol for methods
+                                        EnumMember = "τ", -- Lambda symbol for methods
+                                        Snippet = "⊂",
+                                        Text = "τ",
+                                        Module = "⌠",
+                                        Constructor = "∑",
+                                    }
+
+                                    local icon = kind_icons[ctx.kind]
+                                    if icon == nil then
+                                        icon = ctx.kind_icon
+                                    end
+                                    return icon
+                                end,
+                            },
+                        },
+                    },
+                },
+            },
+            snippets = {
+                preset = "luasnip",
+                -- Function to use when expanding LSP provided snippets
+                expand = function(snippet)
+                    vim.snippet.expand(snippet)
+                end,
+                -- Function to use when checking if a snippet is active
+                active = function(filter)
+                    return vim.snippet.active(filter)
+                end,
+                -- Function to use when jumping between tab stops in a snippet, where direction can be negative or positive
+                jump = function(direction)
+                    vim.snippet.jump(direction)
+                end,
+            },
+            sources = {
+                default = { "lsp", "path", "snippets", "buffer" },
+            },
+            fuzzy = { implementation = "prefer_rust_with_warning" },
+        },
+        opts_extend = { "sources.default" },
+    },
 }
