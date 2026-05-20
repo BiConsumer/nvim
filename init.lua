@@ -25,6 +25,14 @@ vim.opt.listchars = {
     space = "·"
 }
 
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+    pattern = "*",
+    callback = function()
+        vim.api.nvim_set_hl(0, "Whitespace", { fg = "#2b2b29" })
+    end,
+})
+
 vim.opt.sessionoptions = {
     "buffers",
     "curdir",
