@@ -114,6 +114,13 @@ return {
             },
         })
 
+        vim.lsp.config("stylua", {
+            cmd = { "stylua", "--lsp" },
+            filetypes = { "luau" },
+        })
+
+        vim.lsp.enable("stylua")
+
         require("luau-lsp").setup {
             platform = {
                 type = "roblox",
