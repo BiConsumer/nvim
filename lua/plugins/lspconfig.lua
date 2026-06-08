@@ -91,7 +91,7 @@ return {
         vim.lsp.config("jsonls", {})
         vim.lsp.config("neocmake", {})
         vim.lsp.config("clangd", {
-            cmd = { "clangd", "--fallback-style=none", "--background-index", "--clang-tidy" }
+            cmd = { "clangd", "--fallback-style=none", "--background-index", "--clang-tidy", "--pch-storage=memory", "--completion-style=detailed" }
         })
 
         vim.lsp.config("glsl_analyzer", {})
